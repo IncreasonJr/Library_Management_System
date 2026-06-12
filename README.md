@@ -65,7 +65,7 @@ python seed.py
 
 ### 6. Run the Application
 ```bash
-python app.py
+python wsgi.py
 ```
 Visit the application at `http://127.0.0.1:5000`.
 
@@ -74,7 +74,7 @@ Visit the application at `http://127.0.0.1:5000`.
 ## 📧 Automated Reminders & Reservation Expirations
 Run the automated reminders command via cron job or scheduler:
 ```bash
-python app.py send-reminders
+python wsgi.py send-reminders
 ```
 This script processes:
 - Overdue notices for members.
