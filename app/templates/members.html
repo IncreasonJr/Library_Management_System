@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Members{% endblock %}
+{% block page_class %}books-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">Member Directory</p>
+			<h1>Members</h1>
+			<p>Review registered members in a clean, searchable layout.</p>
+		</div>
+		<a class="ghost-link" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+	</div>
+
+	<div class="surface-card">
+		<table class="data-table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Role</th>
+					<th>Joined</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for member in members %}
+					<tr>
+						<td>{{ member.name }}</td>
+						<td>{{ member.email }}</td>
+						<td><span class="badge-available">{{ member.role|title }}</span></td>
+						<td>{{ member.created_at.strftime('%b %d, %Y') }}</td>
+					</tr>
+				{% else %}
+					<tr><td colspan="4">No members found.</td></tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</section>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Log{% endblock %}
+{% block page_class %}activity-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">System Monitoring</p>
+			<h1>Activity Log</h1>
+			<p>Track actions performed by members and administrators across the system in real time.</p>
+		</div>
+	</div>
+
+	<!-- Filter & Search Bar -->
+	<div class="surface-card" style="margin-bottom: 2rem;">
+		<form method="get" action="{{ url_for('main.admin_activity') }}" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+			<div style="display: flex; flex-direction: column; gap: 0.25rem;">
+				<label style="font-size: 0.8rem; font-weight: 700; color: #475569;">Action Type</label>
+				<select name="action_type" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: white; font-weight: 600; color: #1e293b; min-width: 180px;">
+					<option value="">All Actions</option>
+					{% for type in action_types %}
+						<option value="{{ type }}" {% if selected_action == type %}selected{% endif %}>{{ type|replace('_', ' ')|title }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			<div style="display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; min-width: 200px;">
+				<label style="font-size: 0.8rem; font-weight: 700; color: #475569;">Search User</label>
+				<input type="text" name="user_search" placeholder="Search by name or email..." value="{{ user_search }}" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; color: #1e293b;">
+			</div>
+
+			<div style="display: flex; gap: 0.5rem;">
+				<button type="submit" class="btn-primary" style="padding: 0.5rem 1.25rem; border-radius: 8px; height: 38px;">Filter</button>
+				<a href="{{ url_for('main.admin_activity') }}" class="btn-ghost" style="padding: 0.5rem 1.25rem; border-radius: 8px; height: 38px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; line-height: 1;">Clear</a>
+			</div>
+		</form>
+	</div>
+
+	<!-- Activity Timeline Feed -->
+	<div class="surface-card">
+		{% if activities %}
+			<div class="timeline" style="position: relative; padding-left: 2rem; border-left: 2px solid #e2e8f0; margin-left: 1rem; display: flex; flex-direction: column; gap: 2rem;">
+				{% for activity in activities %}
+					{% set details = activity.details_dict %}
+					<div class="timeline-item" style="position: relative;">
+						<!-- Timeline marker dot -->
+						<div class="timeline-marker" style="position: absolute; left: -2.65rem; top: 0.25rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; background-color: 
+							{% if activity.action == 'user_registered' %}#3b82f6
+							{% elif activity.action == 'user_logged_in' %}#10b981
+							{% elif activity.action == 'borrowed_book' %}#8b5cf6
+							{% elif activity.action == 'returned_book' %}#ec4899
+							{% elif activity.action in ['added_book', 'edited_book'] %}#f59e0b
+							{% elif activity.action == 'deleted_book' %}#ef4444
+							{% else %}#64748b
+							{% endif %};">
+						</div>
+						
+						<!-- Timeline Content Card -->
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+							<div>
+								<div style="display: flex; align-items: center; gap: 0.75rem;">
+									<!-- User Avatar -->
+									<div style="width: 2.25rem; height: 2.25rem; border-radius: 50%; background: rgba(255, 255, 255, 0.6); color: #1f2937; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
+										{{ (activity.user.name[:1]|upper) if activity.user else 'S' }}
+									</div>
+									<div>
+										<strong style="color: #1e293b; font-size: 0.95rem;">
+											{{ activity.user.name if activity.user else 'System' }}
+										</strong>
+										<span style="font-size: 0.8rem; color: #64748b; margin-left: 0.25rem;">({{ activity.user.email if activity.user else 'system@library.com' }})</span>
+									</div>
+								</div>
+
+								<!-- Action Description -->
+								<div style="margin-top: 0.75rem; font-size: 0.9rem; color: #334155; line-height: 1.5; background: rgba(255, 255, 255, 0.4); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); min-width: 320px;">
+									<span class="badge" style="font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-radius: 6px; padding: 0.2rem 0.5rem; display: inline-block; margin-bottom: 0.4rem; background-color: 
+										{% if activity.action == 'user_registered' %}rgba(59, 130, 246, 0.12); color: #2563eb;
+										{% elif activity.action == 'user_logged_in' %}rgba(16, 185, 129, 0.12); color: #059669;
+										{% elif activity.action == 'borrowed_book' %}rgba(139, 92, 246, 0.12); color: #7c3aed;
+										{% elif activity.action == 'returned_book' %}rgba(236, 72, 153, 0.12); color: #db2777;
+										{% elif activity.action in ['added_book', 'edited_book'] %}rgba(245, 158, 11, 0.12); color: #d97706;
+										{% elif activity.action == 'deleted_book' %}rgba(239, 68, 68, 0.12); color: #dc2626;
+										{% else %}rgba(100, 116, 139, 0.12); color: #475569;
+										{% endif %};">
+										{{ activity.action|replace('_', ' ') }}
+									</span>
+									<p style="margin: 0;">
+										{% if activity.action == 'user_registered' %}
+											Registered a new account.
+										{% elif activity.action == 'user_logged_in' %}
+											Logged in to the system.
+										{% elif activity.action == 'borrowed_book' %}
+											Borrowed book <strong>{{ details.title }}</strong>.
+										{% elif activity.action == 'returned_book' %}
+											Returned book <strong>{{ details.title }}</strong>. Fines charged: <strong>${{ "%.2f"|format(details.fine_amount) if details.fine_amount else "0.00" }}</strong>.
+										{% elif activity.action == 'added_book' %}
+											Added a new book: <strong>{{ details.title }}</strong> (ISBN: {{ details.isbn }}).
+										{% elif activity.action == 'edited_book' %}
+											Modified book information for <strong>{{ details.title }}</strong>.
+										{% elif activity.action == 'deleted_book' %}
+											Deleted book <strong>{{ details.title }}</strong>.
+										{% elif activity.action == 'profile_updated' %}
+											Updated profile information.
+										{% elif activity.action == 'password_changed' %}
+											Updated account password.
+										{% else %}
+											Performed system action.
+										{% endif %}
+									</p>
+								</div>
+							</div>
+							
+							<!-- Time badge -->
+							<div style="font-size: 0.8rem; color: #64748b; font-weight: 500; text-align: right;">
+								<div>{{ activity.timestamp|timeago }}</div>
+								<div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem;">{{ activity.timestamp.strftime("%b %d, %H:%M UTC") }}</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+			<!-- Pagination Controls -->
+			{% if pagination.pages > 1 %}
+				<div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2.5rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem;">
+					{% if pagination.has_prev %}
+						<a href="{{ url_for('main.admin_activity', page=pagination.prev_num, action_type=selected_action, user_search=user_search) }}" class="btn-ghost" style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1; text-decoration: none; color: #475569; font-weight: 600; line-height: 1;">Previous</a>
+					{% endif %}
+
+					<span style="display: inline-flex; align-items: center; font-size: 0.9rem; color: #64748b; font-weight: 600; padding: 0 1rem;">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+					{% if pagination.has_next %}
+						<a href="{{ url_for('main.admin_activity', page=pagination.next_num, action_type=selected_action, user_search=user_search) }}" class="btn-ghost" style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1; text-decoration: none; color: #475569; font-weight: 600; line-height: 1;">Next</a>
+					{% endif %}
+				</div>
+			{% endif %}
+
+		{% else %}
+			<div style="text-align: center; padding: 3rem 0; color: #64748b;">
+				<div style="font-size: 2.5rem; margin-bottom: 1rem;">⏱</div>
+				<h3>No activity recorded yet</h3>
+				<p>Perform some system actions to populate this timeline feed.</p>
+			</div>
+		{% endif %}
+	</div>
+</section>
+{% endblock %}

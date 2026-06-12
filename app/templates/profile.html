@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile – {{ user.name }}{% endblock %}
+{% block page_class %}books-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+
+	<!-- Hero Panel -->
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">Account Profile</p>
+			<h1>{{ user.name }}</h1>
+			<p>Member since {{ user.created_at.strftime("%B %Y") }}</p>
+		</div>
+		<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+			<span class="profile-badge">{{ user.role|title }}</span>
+			<a class="btn-ghost" href="{{ url_for('main.edit_profile') }}">Edit Profile</a>
+			<a class="btn-ghost" href="{{ url_for('main.my_books') }}">My Books</a>
+		</div>
+	</div>
+
+	<!-- Stats Row -->
+	<div class="profile-stats-grid">
+		<div class="profile-stat-card">
+			<div class="stat-icon">
+				<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+					<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+				</svg>
+			</div>
+			<strong>{{ total_borrowed }}</strong>
+			<span>Total Borrowed</span>
+		</div>
+		<div class="profile-stat-card">
+			<div class="stat-icon" style="color: #2563eb;">
+				<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+					<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+				</svg>
+			</div>
+			<strong>{{ currently_borrowed }}</strong>
+			<span>Currently Borrowing</span>
+		</div>
+		<div class="profile-stat-card {% if overdue_count > 0 %}stat-card-alert{% endif %}">
+			<div class="stat-icon" style="color: #ef4444;">
+				<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+					<line x1="12" y1="9" x2="12" y2="13"></line>
+					<line x1="12" y1="17" x2="12.01" y2="17"></line>
+				</svg>
+			</div>
+			<strong>{{ overdue_count }}</strong>
+			<span>Overdue Books</span>
+		</div>
+	</div>
+
+	<!-- Account Info Card -->
+	<div class="surface-card">
+		<h2 class="section-title">Account Details</h2>
+		<div class="profile-detail-list">
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Full Name</span>
+				<strong>{{ user.name }}</strong>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Email Address</span>
+				<strong>{{ user.email }}</strong>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Role</span>
+				<span class="profile-badge">{{ user.role|title }}</span>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Account Status</span>
+				<span class="badge-available">Active</span>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Email Notifications</span>
+				<strong>{{ "Enabled" if user.email_notifications else "Disabled" }}</strong>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Reminder Interval</span>
+				<strong>{{ user.reminder_days }} days before due</strong>
+			</div>
+			<div class="profile-detail-row">
+				<span class="profile-detail-label">Member Since</span>
+				<strong>{{ user.created_at.strftime("%B %d, %Y") }}</strong>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Change Password -->
+	<div class="surface-card">
+		<h2 class="section-title">Change Password</h2>
+		<form class="modern-form password-form" method="post" action="{{ url_for('main.change_password') }}">
+			{{ password_form.hidden_tag() }}
+			<div class="form-field">
+				{{ password_form.current_password.label(class="form-label") }}
+				{{ password_form.current_password(class="form-input", placeholder="Enter your current password") }}
+				{% if password_form.current_password.errors %}
+					{% for e in password_form.current_password.errors %}
+						<p class="field-error">{{ e }}</p>
+					{% endfor %}
+				{% endif %}
+			</div>
+			<div class="form-row-2">
+				<div class="form-field">
+					{{ password_form.new_password.label(class="form-label") }}
+					{{ password_form.new_password(class="form-input", placeholder="Min. 8 characters") }}
+					{% if password_form.new_password.errors %}
+						{% for e in password_form.new_password.errors %}
+							<p class="field-error">{{ e }}</p>
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div class="form-field">
+					{{ password_form.confirm_password.label(class="form-label") }}
+					{{ password_form.confirm_password(class="form-input", placeholder="Repeat new password") }}
+					{% if password_form.confirm_password.errors %}
+						{% for e in password_form.confirm_password.errors %}
+							<p class="field-error">{{ e }}</p>
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ password_form.submit(class="btn-primary") }}
+			</div>
+		</form>
+	</div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Books{% endblock %}
+{% block page_class %}books-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+
+	<!-- Hero Panel -->
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">Catalog Browser</p>
+			<h1>Books Listing</h1>
+			<p>Search the catalog and manage book records.</p>
+		</div>
+		{% if current_user.role in ['admin', 'librarian'] %}
+			<a class="btn-primary" href="{{ url_for('main.add_book') }}">+ Add Book</a>
+		{% endif %}
+	</div>
+
+	<!-- Search & Filter Bar -->
+	<div class="surface-card">
+		<form class="filter-bar" method="get" action="{{ url_for('main.books') }}">
+			<div class="filter-row">
+				<div class="filter-group filter-search">
+					<label class="filter-label" for="books-search">Search</label>
+					<input type="search" id="books-search" name="q" placeholder="Title, author, or ISBN…" value="{{ search_value }}">
+				</div>
+
+				<div class="filter-group">
+					<label class="filter-label" for="books-category">Category</label>
+					<select id="books-category" name="category">
+						<option value="">All Categories</option>
+						{% for cat in categories %}
+							<option value="{{ cat.name }}" {% if current_category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<div class="filter-group">
+					<label class="filter-label" for="books-availability">Availability</label>
+					<select id="books-availability" name="availability">
+						<option value="">All Books</option>
+						<option value="available" {% if current_availability == 'available' %}selected{% endif %}>Available Only</option>
+					</select>
+				</div>
+
+				<div class="filter-group">
+					<label class="filter-label" for="books-sort">Sort By</label>
+					<select id="books-sort" name="sort">
+						<option value="title_asc" {% if current_sort == 'title_asc' %}selected{% endif %}>Title A–Z</option>
+						<option value="title_desc" {% if current_sort == 'title_desc' %}selected{% endif %}>Title Z–A</option>
+						<option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+						<option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest</option>
+					</select>
+				</div>
+
+				<div class="filter-actions">
+					<button type="submit" class="btn-primary">Apply</button>
+					<a class="btn-ghost" href="{{ url_for('main.books') }}">Clear</a>
+				</div>
+			</div>
+		</form>
+
+		<p class="results-count">
+			Showing <strong>{{ pagination.total }}</strong> book{{ 's' if pagination.total != 1 }}
+			{% if search_value or current_category or current_availability == 'available' %}
+				matching your filters
+				&mdash; <a href="{{ url_for('main.books') }}">clear filters</a>
+			{% endif %}
+		</p>
+	</div>
+
+	<!-- Book Cards -->
+	<div class="surface-card">
+		{% if books %}
+			<div class="book-list">
+				{% for book in books %}
+					{% set ns = namespace(is_borrowed=false) %}
+					{% for b in current_user.borrowings %}
+						{% if b.book_id == book.id and b.status == 'borrowed' %}
+							{% set ns.is_borrowed = true %}
+						{% endif %}
+					{% endfor %}
+
+					<div class="book-row">
+						<div class="book-cover-placeholder" style="background: hsl({{ (book.id * 53) % 360 }}, 55%, 55%);">
+							{{ book.title[0]|upper }}
+						</div>
+						<div class="book-row-info">
+							<a class="book-row-title" href="{{ url_for('main.book_detail', book_id=book.id) }}">{{ book.title }}</a>
+							<div class="book-row-meta">
+								<span>{{ book.author }}</span>
+								<span class="category-badge">{{ book.category }}</span>
+							</div>
+							<div class="book-row-stats">
+								<span class="availability-text">
+									{% if book.available > 0 %}
+										<span class="dot dot-green"></span> {{ book.available }}/{{ book.quantity }} available
+									{% else %}
+										<span class="dot dot-red"></span> Out of stock (0/{{ book.quantity }})
+									{% endif %}
+
+									{% set waiting_res = book.reservations|selectattr('status', 'in', ['waiting', 'notified'])|list %}
+									{% if waiting_res|length > 0 %}
+										<span class="badge-waiting-count" style="margin-left: 0.5rem; background: #e9d5ff; color: #6b21a8; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700; font-size: 0.72rem;">
+											⏱ {{ waiting_res|length }} waiting
+										</span>
+									{% endif %}
+								</span>
+							</div>
+						</div>
+						<div class="book-row-actions">
+							{% if ns.is_borrowed %}
+								<span class="badge-current">Currently borrowed</span>
+								<form method="post" action="{{ url_for('main.return_book', book_id=book.id) }}" style="display:inline;">
+									<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+									<button type="submit" class="btn-return">Return</button>
+								</form>
+							{% elif book.available > 0 %}
+								{% set has_user_hold = book.reservations|selectattr('user_id', 'equalto', current_user.id)|selectattr('status', 'equalto', 'notified')|list|length > 0 %}
+								{% set notified_count = book.reservations|selectattr('status', 'equalto', 'notified')|list|length %}
+								{% set truly_available = book.available - notified_count %}
+
+								{% if has_user_hold or truly_available > 0 %}
+									<form method="post" action="{{ url_for('main.borrow_book', book_id=book.id) }}" style="display:inline;">
+										<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+										<button type="submit" class="btn-borrow">Borrow</button>
+									</form>
+								{% else %}
+									<button class="btn-borrow btn-borrow-disabled" disabled style="background: #cbd5e1; color: #94a3b8; box-shadow: none;">On Hold</button>
+								{% endif %}
+							{% else %}
+								{% set has_user_waiting = book.reservations|selectattr('user_id', 'equalto', current_user.id)|selectattr('status', 'in', ['waiting', 'notified'])|list|length > 0 %}
+								{% if has_user_waiting %}
+									<span class="badge-waiting" style="background: #fef3c7; color: #d97706; padding: 0.3rem 0.65rem; border-radius: 999px; font-size: 0.76rem; font-weight: 700;">Reserved</span>
+								{% else %}
+									<form method="post" action="{{ url_for('main.reserve_book', book_id=book.id) }}" style="display:inline;">
+										<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+										<button type="submit" class="btn-reserve" style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; padding: 0.55rem 1rem; border-radius: 10px; border: none; font-weight: 700; font-size: 0.84rem; cursor: pointer; box-shadow: 0 4px 12px rgba(168,85,247,0.25);">Reserve</button>
+									</form>
+								{% endif %}
+							{% endif %}
+
+
+							{% if current_user.role in ['admin', 'librarian'] %}
+								<a class="btn-edit" href="{{ url_for('main.edit_book', book_id=book.id) }}">Edit</a>
+							{% endif %}
+							{% if current_user.role == 'admin' %}
+								<form method="post" action="{{ url_for('main.delete_book', book_id=book.id) }}" style="display:inline;">
+									<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+									<button type="submit" class="btn-danger" onclick="return confirm('Delete this book?')">Delete</button>
+								</form>
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="empty-state-block">
+				<div class="empty-icon">
+					<svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b; display: block; margin: 0 auto 1rem;">
+						<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+						<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+					</svg>
+				</div>
+				<h3>No books found</h3>
+				{% if search_value or current_category or current_availability %}
+					<p>No books match your current filters.</p>
+					<a class="btn-primary" href="{{ url_for('main.books') }}">Clear Filters</a>
+				{% else %}
+					<p>The library catalog is empty.</p>
+					{% if current_user.role in ['admin', 'librarian'] %}
+						<a class="btn-primary" href="{{ url_for('main.add_book') }}">Add a Book</a>
+					{% endif %}
+				{% endif %}
+			</div>
+		{% endif %}
+	</div>
+
+	<!-- Pagination -->
+	{% if pagination.pages > 1 %}
+		<div class="surface-card">
+			<nav class="pagination-nav" aria-label="Page navigation">
+				{% set base_args = {'q': search_value, 'category': current_category, 'availability': current_availability, 'sort': current_sort} %}
+				{% if pagination.has_prev %}
+					<a class="page-btn" href="{{ url_for('main.books', page=pagination.prev_num, **base_args) }}">&laquo; Prev</a>
+				{% else %}
+					<span class="page-btn page-btn-disabled">&laquo; Prev</span>
+				{% endif %}
+
+				{% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+					{% if p %}
+						{% if p == pagination.page %}
+							<span class="page-btn page-btn-active">{{ p }}</span>
+						{% else %}
+							<a class="page-btn" href="{{ url_for('main.books', page=p, **base_args) }}">{{ p }}</a>
+						{% endif %}
+					{% else %}
+						<span class="page-btn page-btn-ellipsis">…</span>
+					{% endif %}
+				{% endfor %}
+
+				{% if pagination.has_next %}
+					<a class="page-btn" href="{{ url_for('main.books', page=pagination.next_num, **base_args) }}">Next &raquo;</a>
+				{% else %}
+					<span class="page-btn page-btn-disabled">Next &raquo;</span>
+				{% endif %}
+			</nav>
+		</div>
+	{% endif %}
+
+</section>
+{% endblock %}

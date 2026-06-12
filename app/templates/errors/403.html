@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set no_sidebar = true %}
+
+{% block title %}Access Denied (403){% endblock %}
+{% block page_class %}auth-page{% endblock %}
+
+{% block content %}
+<section class="error-container">
+    <div class="error-card">
+        <div class="auth-logo" style="margin-bottom: 1.5rem;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 0;">
+        </div>
+        <h1 class="error-title">Access Denied</h1>
+        <p class="error-message">You do not have the necessary permissions to access this page. Please contact the library administrator if you think this is a mistake.</p>
+        
+        <div class="error-actions" style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem;">
+            <a href="javascript:history.back()" class="btn-ghost">Go Back</a>
+            <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}" class="btn-primary">Go Home</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

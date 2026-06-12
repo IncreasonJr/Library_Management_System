@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+{% block page_class %}books-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">Account Settings</p>
+			<h1>Edit Profile</h1>
+			<p>Update your name and email address.</p>
+		</div>
+		<a class="btn-ghost" href="{{ url_for('main.profile') }}">&larr; Back to Profile</a>
+	</div>
+
+	<div class="surface-card form-card">
+		<form class="modern-form" method="post" action="{{ url_for('main.edit_profile') }}">
+			{{ form.hidden_tag() }}
+
+			<div class="form-field">
+				{{ form.name.label(class="form-label") }}
+				{{ form.name(class="form-input", placeholder="Your full name") }}
+				{% if form.name.errors %}
+					{% for e in form.name.errors %}
+						<p class="field-error">{{ e }}</p>
+					{% endfor %}
+				{% endif %}
+			</div>
+
+			<div class="form-field">
+				{{ form.email.label(class="form-label") }}
+				{{ form.email(class="form-input", placeholder="your@email.com") }}
+				{% if form.email.errors %}
+					{% for e in form.email.errors %}
+						<p class="field-error">{{ e }}</p>
+					{% endfor %}
+				{% endif %}
+			</div>
+
+			<div class="form-field checkbox-field">
+				<label class="form-checkbox-label">
+					{{ form.email_notifications() }}
+					<span>{{ form.email_notifications.label.text }}</span>
+				</label>
+				{% if form.email_notifications.errors %}
+					{% for e in form.email_notifications.errors %}
+						<p class="field-error">{{ e }}</p>
+					{% endfor %}
+				{% endif %}
+			</div>
+
+			<div class="form-field">
+				{{ form.reminder_days.label(class="form-label") }}
+				{{ form.reminder_days(class="form-input", placeholder="e.g. 3") }}
+				{% if form.reminder_days.errors %}
+					{% for e in form.reminder_days.errors %}
+						<p class="field-error">{{ e }}</p>
+					{% endfor %}
+				{% endif %}
+			</div>
+
+			<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+				{{ form.submit(class="btn-primary") }}
+				<a class="btn-ghost" href="{{ url_for('main.profile') }}">Cancel</a>
+			</div>
+
+		</form>
+	</div>
+
+</section>
+{% endblock %}

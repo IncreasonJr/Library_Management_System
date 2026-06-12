@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% set no_sidebar = true %}
+
+{% block title %}Home{% endblock %}
+{% block page_class %}landing-page{% endblock %}
+
+{% block content %}
+<style>
+    /* Clean up main layout constraints for the full-width landing page */
+    .landing-page .main-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+    }
+    .landing-page main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .landing-page .app-shell {
+        overflow-x: hidden !important;
+    }
+</style>
+
+<div class="landing-page-wrapper">
+    <!-- Fixed Navigation Bar -->
+    <header class="landing-nav">
+        <div class="landing-nav-left">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest" class="nav-logo">
+            <span class="nav-brand">BookNest</span>
+        </div>
+        <div class="landing-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#testimonials">Testimonials</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="nav-btn-primary">Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="nav-btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="landing-hero">
+        <div class="landing-hero-content hero-float">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest" class="hero-logo">
+            <h1>BookNest</h1>
+            <p>Effortless library control. Manage your books, members, and borrowings with clarity and care.</p>
+            <div class="landing-hero-actions">
+                {% if current_user.is_authenticated %}
+                    <a class="btn-landing-primary" href="{{ url_for('main.dashboard') }}">Go to Dashboard</a>
+                {% else %}
+                    <a class="btn-landing-primary" href="{{ url_for('auth.register') }}">Get Started</a>
+                {% endif %}
+                <a class="btn-landing-secondary" href="#stats">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Counter Section -->
+    <section id="stats" class="landing-section">
+        <h2 class="landing-section-title">Library by the Numbers</h2>
+        <p class="landing-section-subtitle">Your books, perfectly nested.</p>
+        
+        <div class="landing-stats-grid reveal">
+            <div class="landing-stat-card glass-card">
+                <div class="landing-stat-num counter" data-target="10000">0</div>
+                <div class="landing-stat-label">Books Available</div>
+            </div>
+            <div class="landing-stat-card glass-card">
+                <div class="landing-stat-num counter" data-target="5000">0</div>
+                <div class="landing-stat-label">Active Members</div>
+            </div>
+            <div class="landing-stat-card glass-card">
+                <div class="landing-stat-num counter" data-target="50000">0</div>
+                <div class="landing-stat-label">Total Borrowings</div>
+            </div>
+            <div class="landing-stat-card glass-card">
+                <div class="landing-stat-num">24/7</div>
+                <div class="landing-stat-label">System Access</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="landing-section">
+        <h2 class="landing-section-title">What You Can Do</h2>
+        <p class="landing-section-subtitle">Explore the features designed to streamline cataloging and lending activity.</p>
+        
+        <div class="landing-features-grid">
+            <div class="landing-feature-card glass-card reveal reveal-delay-1">
+                <div class="landing-feature-icon">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <h3>Catalog Management</h3>
+                <p>Keep titles, categories, and availability organized. Search, filter, and access your books instantly.</p>
+            </div>
+            
+            <div class="landing-feature-card glass-card reveal reveal-delay-2">
+                <div class="landing-feature-icon">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <h3>Borrowing Tracker</h3>
+                <p>Monitor member borrowings, due dates, and return status quickly. Automate due date email reminders.</p>
+            </div>
+            
+            <div class="landing-feature-card glass-card reveal reveal-delay-3">
+                <div class="landing-feature-icon">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h3>Secure Access</h3>
+                <p>Advanced security rules, profile customization, role-based control and secure authentication systems.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="landing-section">
+        <h2 class="landing-section-title">How It Works</h2>
+        <p class="landing-section-subtitle">Get started with our system in three simple steps.</p>
+        
+        <div class="landing-steps">
+            <div class="landing-step-row reveal-left">
+                <div class="landing-step-badge">1</div>
+                <div class="landing-step-content">
+                    <div class="landing-step-card glass-card">
+                        <h3>Register Your Account</h3>
+                        <p>Create a free member or administrator account in seconds to get started with our system.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="landing-step-row reveal-right" style="justify-content: flex-end;">
+                <div class="landing-step-badge">2</div>
+                <div class="landing-step-content">
+                    <div class="landing-step-card glass-card">
+                        <h3>Browse & Borrow</h3>
+                        <p>Explore our extensive catalog, search for your favorite books, and request borrowings seamlessly.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="landing-step-row reveal-left">
+                <div class="landing-step-badge">3</div>
+                <div class="landing-step-content">
+                    <div class="landing-step-card glass-card">
+                        <h3>Track & Return</h3>
+                        <p>Keep track of your borrowed books, receive automatic reminders, and return books easily.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="landing-section">
+        <h2 class="landing-section-title">Librarian Endorsement</h2>
+        <p class="landing-section-subtitle">See what professional catalogers say about our system.</p>
+        
+        <div class="landing-quote-card glass-card reveal">
+            <span class="quote-mark quote-mark-start">“</span>
+            <blockquote>
+                "This system has transformed how we catalog and track our library resources. The interface is incredibly clean, and the automated email notifications make managing returns effortless."
+            </blockquote>
+            <div class="landing-quote-author">Sarah Jenkins — Head Librarian</div>
+            <span class="quote-mark quote-mark-end">”</span>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="landing-section">
+        <div class="landing-cta-card glass-card reveal">
+            <h2>Ready to Organize Your Library?</h2>
+            <p>Join thousands of members and start tracking books and managing borrowings today.</p>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="btn-landing-primary btn-pulse">Go to Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn-landing-primary btn-pulse">Create Free Account</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="landing-footer-content">
+            <p class="developer-credit">Developed by <span class="developer-name">IncreasonJr</span></p>
+            <p class="copyright">&copy; 2026 BookNest. All rights reserved.</p>
+            <div class="landing-footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Navigation Bar Scroll Class
+        const nav = document.querySelector('.landing-nav');
+        function checkScroll() {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+        window.addEventListener('scroll', checkScroll);
+        checkScroll(); // Run once in case they reload scrolled down
+
+        // 2. Intersection Observer for Scroll-triggered animations
+        const revealCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    // If this is a counter card or contains counters, trigger them
+                    const counters = entry.target.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        if (!counter.classList.contains('counted')) {
+                            counter.classList.add('counted');
+                            animateCounter(counter);
+                        }
+                    });
+                    
+                    // Unobserve if we only want the animation to run once
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+
+        const revealObserver = new IntersectionObserver(revealCallback, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px' // Trigger slightly before it's fully in view
+        });
+
+        // Register all reveal elements
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 3. Count-up Animation Function
+        function animateCounter(el) {
+            const target = parseInt(el.getAttribute('data-target'), 10);
+            const duration = 1500; // 1.5s duration
+            const frameRate = 1000 / 60; // 60 fps
+            const totalFrames = Math.round(duration / frameRate);
+            let frame = 0;
+
+            const timer = setInterval(() => {
+                frame++;
+                const progress = frame / totalFrames;
+                
+                // Easing out quadratic
+                const easeProgress = progress * (2 - progress);
+                const currentValue = Math.round(easeProgress * target);
+                
+                el.textContent = currentValue.toLocaleString() + "+";
+
+                if (frame === totalFrames) {
+                    clearInterval(timer);
+                    el.textContent = target.toLocaleString() + "+";
+                }
+            }, frameRate);
+        }
+    });
+</script>
+{% endblock %}

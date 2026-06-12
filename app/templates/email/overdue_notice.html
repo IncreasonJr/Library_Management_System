@@ -1,0 +1,33 @@
+{% extends "email/base_email.html" %}
+
+{% block content %}
+<h2 style="color: #d9534f;">⚠️ OVERDUE NOTICE</h2>
+<p>Hello {{ user.name }},</p>
+<p>Our records show that the book listed below is overdue and has not been returned to the library.</p>
+
+<div class="detail-card" style="border-left-color: #d9534f; background-color: #fdf7f7;">
+    <div class="detail-row">
+        <span class="detail-label">Book Title:</span>
+        <span class="detail-value"><strong>{{ book.title }}</strong></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Author:</span>
+        <span class="detail-value">{{ book.author }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Days Overdue:</span>
+        <span class="detail-value" style="color: #d9534f; font-weight: bold;">{{ days_overdue }} days</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Accumulated Fine:</span>
+        <span class="detail-value" style="color: #d9534f; font-weight: bold;">${{ "%.2f"|format(fine) }}</span>
+    </div>
+</div>
+
+<p>Overdue fines accumulate at a rate of <strong>$0.50 per day</strong>. Please return this book as soon as possible to prevent further fine accumulation.</p>
+
+<p>If you have any questions, please contact our desk.</p>
+
+<p>Thank you,</p>
+<p>— The Library Team</p>
+{% endblock %}

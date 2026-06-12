@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set no_sidebar = true %}
+
+{% block title %}Page Not Found (404){% endblock %}
+{% block page_class %}auth-page{% endblock %}
+
+{% block content %}
+<section class="error-container">
+    <div class="error-card">
+        <div class="auth-logo" style="margin-bottom: 1.5rem;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 0;">
+        </div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">Oops! We searched the entire catalog but could not find the page you were looking for.</p>
+        
+        <form class="error-search-bar" method="get" action="{{ url_for('main.books') }}">
+            <input type="search" name="q" placeholder="Try searching for books, authors..." required>
+            <button type="submit" class="btn-primary">Search Catalog</button>
+        </form>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}" class="btn-primary">Go Home</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

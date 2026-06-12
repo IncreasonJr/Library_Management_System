@@ -1,0 +1,40 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+		<div class="flash-messages-container" id="flash-container">
+			{% for category, message in messages %}
+				<div class="flash-card flash-{{ category }}" data-flash>
+					<div class="flash-content">
+						<span class="flash-icon">
+							{% if category == 'success' %}
+								<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+							{% elif category == 'danger' %}
+								<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+							{% elif category == 'warning' %}
+								<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+							{% else %}
+								<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+							{% endif %}
+						</span>
+						<span class="flash-text">{{ message }}</span>
+					</div>
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+		</div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const flashes = document.querySelectorAll('[data-flash]');
+				flashes.forEach(flash => {
+					setTimeout(() => {
+						flash.style.opacity = '0';
+						flash.style.transform = 'translateX(50px)';
+						setTimeout(() => {
+							flash.remove();
+						}, 400);
+					}, 5000);
+				});
+			});
+		</script>
+	{% endif %}
+{% endwith %}

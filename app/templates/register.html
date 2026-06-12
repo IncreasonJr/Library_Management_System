@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+{% block page_class %}auth-page{% endblock %}
+
+{% block content %}
+<header class="landing-nav" style="position: absolute;">
+	<div class="landing-nav-left">
+		<img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest" class="nav-logo">
+		<span class="nav-brand">BookNest</span>
+	</div>
+	<div class="landing-nav-links">
+		<a href="{{ url_for('main.index') }}" class="nav-btn-primary">&larr; Back to Home</a>
+	</div>
+</header>
+
+<div class="auth-logo">
+	<img src="{{ url_for('static', filename='images/logo.png') }}" alt="BookNest">
+</div>
+
+<section class="auth-card form-card">
+	<h2>Create Account</h2>
+	<p class="auth-subtitle">Register to start managing books and borrowings.</p>
+	<form method="post">
+		{{ form.hidden_tag() }}
+		<div>
+			{{ form.name.label }}
+			{{ form.name(placeholder="Enter your name") }}
+			{% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+		</div>
+		<div>
+			{{ form.email.label }}
+			{{ form.email(placeholder="Enter your email") }}
+			{% for error in form.email.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+		</div>
+		<div>
+			{{ form.password.label }}
+			{{ form.password(placeholder="Choose a secure password") }}
+			{% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+		</div>
+		<div>
+			{{ form.confirm_password.label }}
+			{{ form.confirm_password(placeholder="Confirm your password") }}
+			{% for error in form.confirm_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+		</div>
+		{{ form.submit(class_='auth-submit') }}
+	</form>
+	<div class="auth-card-footer">
+		Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+	</div>
+</section>
+{% endblock %}

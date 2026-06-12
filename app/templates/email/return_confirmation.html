@@ -1,0 +1,31 @@
+{% extends "email/base_email.html" %}
+
+{% block content %}
+<h2>Book Return Confirmed</h2>
+<p>Hello {{ user.name }},</p>
+<p>This email confirms that you have successfully returned the book listed below to the library.</p>
+
+<div class="detail-card" style="border-left-color: #28a745; background-color: #f7fdf7;">
+    <div class="detail-row">
+        <span class="detail-label">Book Title:</span>
+        <span class="detail-value"><strong>{{ book.title }}</strong></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Author:</span>
+        <span class="detail-value">{{ book.author }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Fine Charged:</span>
+        <span class="detail-value">
+            {% if fine > 0 %}
+                <span style="color: #d9534f; font-weight: bold;">${{ "%.2f"|format(fine) }}</span>
+            {% else %}
+                <span style="color: #28a745; font-weight: bold;">$0.00 (None)</span>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<p>Thank you for returning the book. Feel free to browse the catalog to choose your next read!</p>
+<p>— The Library Team</p>
+{% endblock %}

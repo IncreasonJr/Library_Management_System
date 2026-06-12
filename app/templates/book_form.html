@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_class %}books-page{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+	<div class="hero-panel">
+		<div>
+			<p class="eyebrow eyebrow-dark">Catalog Admin</p>
+			<h1>{{ title }}</h1>
+			<p>Create or update a book record using the streamlined admin form below.</p>
+		</div>
+		<a class="ghost-link" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+	</div>
+
+	<div class="surface-card form-card">
+		<h2 class="section-title">Book details</h2>
+		<form class="modern-form" method="post">
+			{{ form.hidden_tag() }}
+			<div>
+				{{ form.title.label }}
+				{{ form.title() }}
+			</div>
+			<div>
+				{{ form.author.label }}
+				{{ form.author() }}
+			</div>
+			<div>
+				{{ form.isbn.label }}
+				{{ form.isbn() }}
+			</div>
+			<div>
+				{{ form.category.label }}
+				{{ form.category() }}
+			</div>
+			<div>
+				{{ form.quantity.label }}
+				{{ form.quantity() }}
+			</div>
+			{{ form.submit(class_='modern-submit') }}
+		</form>
+	</div>
+</section>
+{% endblock %}
