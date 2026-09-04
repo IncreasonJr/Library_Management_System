@@ -24,8 +24,10 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
 	_db_url = os.getenv("DATABASE_URL", "sqlite:///library.db")
-	if _db_url and _db_url.startswith("postgres://"):
-		_db_url = _db_url.replace("postgres://", "postgresql://", 1)
+	if _db_url:
+		_db_url = _db_url.strip()
+		if _db_url.startswith("postgres://"):
+			_db_url = _db_url.replace("postgres://", "postgresql://", 1)
 	SQLALCHEMY_DATABASE_URI = _db_url
 
 
