@@ -23,7 +23,11 @@ login_manager.login_message = "Please log in to access this page."
 
 def init_db(app):
 	with app.app_context():
-		db.create_all()
+		try:
+			db.create_all()
+			app.logger.info("Database tables initialized successfully.")
+		except Exception as e:
+			app.logger.error(f"Database initialization failed (DB may be offline or unreachable): {e}")
 
 
 @login_manager.user_loader

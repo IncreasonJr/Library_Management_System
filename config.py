@@ -23,13 +23,18 @@ class BaseConfig:
 
 
 class DevelopmentConfig(BaseConfig):
-	SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///library.db")
+	_db_url = os.getenv("DATABASE_URL", "sqlite:///library.db")
+	if _db_url and _db_url.startswith("postgres://"):
+		_db_url = _db_url.replace("postgres://", "postgresql://", 1)
+	SQLALCHEMY_DATABASE_URI = _db_url
 
 
 class ProductionConfig(BaseConfig):
-	_db_url = os.getenv("POSTGRESQL_URL", os.getenv("DATABASE_URL"))
-	if _db_url and _db_url.startswith("postgres://"):
-		_db_url = _db_url.replace("postgres://", "postgresql://", 1)
+	_db_url = os.getenv("POSTGRESQL_URL") or os.getenv("DATABASE_URL")
+	if _db_url:
+		_db_url = _db_url.strip()
+		if _db_url.startswith("postgres://"):
+			_db_url = _db_url.replace("postgres://", "postgresql://", 1)
 	SQLALCHEMY_DATABASE_URI = _db_url or "postgresql://postgres:postgres@localhost:5432/library_db"
 
 
@@ -38,3 +43,4 @@ def get_config():
 	if environment == "production":
 		return ProductionConfig
 	return DevelopmentConfig
+

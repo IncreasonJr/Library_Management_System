@@ -12,6 +12,14 @@ def send_reminders():
 	click.echo("Completed sending reminders.")
 
 
+@app.cli.command("seed-db")
+def seed_db():
+	"""Seed database with initial categories, users, and books."""
+	from seed import seed_database
+	seed_database()
+	click.echo("Completed database seeding.")
+
+
 if __name__ == "__main__":
 	import sys
 	if len(sys.argv) > 1:
